@@ -1,0 +1,66 @@
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Student
+
+
+@login_required(login_url='login')
+def home(request):
+    return render(request, 'stud_app/home.html')
+
+@login_required(login_url='login')
+def student_home(request):
+    return render(request, 'stud_app/student_home.html')  
+
+@login_required(login_url='login')
+def get_all_students(request):
+    data = Student.objects.all()   # ✅ fetch all records
+    return render(request, "stud_app/display.html", {"students": data})
+
+@login_required
+def insert_students(request):
+    if request.method == "POST":
+        r = int(request.POST.get("roll"))  
+        name = request.POST.get("name")
+        sbj = request.POST.get("subject")
+        mks = float(request.POST.get("marks"))
+
+        obj = Student(
+            roll=r,
+            name=name,    
+            subject=sbj,
+            marks=mks
+        )
+        obj.save()
+
+        return redirect('student:display_student')
+
+    return render(request, "stud_app/add.html")
+
+
+
+@login_required()
+def update_student(request , pk):
+    obj = Student.objects.get(roll=pk)
+    
+    if request.method == "POST":
+        #r = int(request.POST.get("roll"))  
+        name = request.POST.get("name")
+        sbj = request.POST.get("subject")
+        mks = float(request.POST.get("marks"))
+
+        obj.name=name    
+        obj.subject=sbj
+        obj.marks=mks
+        obj.save()
+        
+        return redirect('student:display_student')
+    
+    context = {'data':obj }
+    return render(request, "stud_app/update.html",context) 
+
+@login_required
+def delete_student(request, pk):
+    obj = Student.objects.get(roll=pk)
+    obj.delete()
+    return redirect('student:display_student')
