@@ -2,7 +2,17 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Student
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+#from .serializer import StudentSerializer
 
+
+# @api_view(['GET'])
+# @permission_classes([AllowAny])  # ✅ Allow unauthenticated access
+# def get_all_students(request):
+#     students = Student.objects.all()
+#     serializer = StudentSerializer(students, many=True)
+#     return Response(serializer.data)
 
 @login_required(login_url='login')
 def home(request):
@@ -14,8 +24,20 @@ def student_home(request):
 
 @login_required(login_url='login')
 def get_all_students(request):
-    data = Student.objects.all()   # ✅ fetch all records
-    return render(request, "stud_app/display.html", {"students": data})
+    data = Student.objects.all()
+    students = []
+
+    for student in data:
+        students.append({
+            'roll': student.roll,
+            'name': student.name,
+            'subject': student.subject,
+            'marks': student.marks
+        })
+
+    return render(request, 'stud_app/display.html', {'students': students})
+
+
 
 @login_required
 def insert_students(request):

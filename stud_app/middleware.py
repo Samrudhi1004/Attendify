@@ -1,5 +1,5 @@
 from django.shortcuts import redirect
-
+from django.urls import reverse
 
 class MYMiddleware:
     """Custom auth enforcement middleware.
@@ -32,3 +32,4 @@ class MYMiddleware:
             return redirect('login')
 
         return self.get_response(request)
+
